@@ -49,6 +49,9 @@ interface EditorState {
   };
 }
 
+/**
+ * 编辑器组件，主要是左边的编辑区和右边的预览区
+ */
 class Editor extends React.Component<EditorProps, EditorState> {
   static defaultProps = {
     value: '',
@@ -214,6 +217,8 @@ class Editor extends React.Component<EditorProps, EditorState> {
       console.error('renderHTML props is required!');
       return Promise.resolve();
     }
+
+    // renderHTML()的返回值类型是string或ReactElement，或是能返回它们的函数
     const res = this.props.renderHTML(markdownText);
     if (isPromise(res)) {
       // @ts-ignore
@@ -625,6 +630,7 @@ class Editor extends React.Component<EditorProps, EditorState> {
       >
         <NavigationBar visible={isShowMenu} left={getPluginAt('left')} right={getPluginAt('right')} />
         <div className="editor-container">
+          {/* 上方工具条 */}
           {showHideMenu && (
             <ToolBar>
               <span
@@ -636,6 +642,8 @@ class Editor extends React.Component<EditorProps, EditorState> {
               </span>
             </ToolBar>
           )}
+
+          {/* 左边文本编辑区域 */}
           <section className={`section sec-md ${view.md ? 'visible' : 'in-visible'}`}>
             <textarea
               id="textarea"
@@ -652,6 +660,8 @@ class Editor extends React.Component<EditorProps, EditorState> {
               onPaste={this.handlePaste}
             />
           </section>
+
+          {/* 右边预览区域 */}
           <section className={`section sec-html ${view.html ? 'visible' : 'in-visible'}`}>
             <div
               className="section-container html-wrap"

@@ -1,11 +1,12 @@
-import * as MarkdownIt from 'markdown-it';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as MarkdownIt from 'markdown-it';
 import * as ReactMarkdown from 'react-markdown';
 import MdEditor, { Plugins } from '../index';
 import content from './content';
 import './index.less';
 
+/** md编辑器中的示例数据 */
 const MOCK_DATA = content;
 
 const PLUGINS = undefined;
@@ -16,6 +17,9 @@ const PLUGINS = undefined;
 //   max: 800
 // });
 
+/**
+ * 本示例可切换md解析器
+ */
 class Demo extends React.Component<any, any> {
   mdEditor?: MdEditor = undefined;
 
@@ -100,12 +104,16 @@ class Demo extends React.Component<any, any> {
     });
   };
 
+  /**
+   * 输入md文本，返回react组件
+   * @param text
+   */
   renderHTML(text: string) {
-    // return this.mdParser.render(text);
+    return this.mdParser.render(text);
     // Using react-markdown
-    return React.createElement(ReactMarkdown, {
-      source: text,
-    });
+    // return React.createElement(ReactMarkdown, {
+    //   source: text,
+    // });
   }
 
   render() {

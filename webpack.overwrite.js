@@ -13,7 +13,7 @@ function hasArgument(name) {
 }
 
 function tryRemoveDir(dir) {
-  fs.rmdir(dir, (err) => {
+  fs.rmdir(dir, err => {
     if (err === null) {
       tryRemoveDir(dir.substr(0, dir.lastIndexOf('/')));
     }
@@ -23,28 +23,30 @@ function tryRemoveDir(dir) {
 module.exports = config => {
   // Alias
   if (config.resolve) {
-    if (typeof (config.resolve.alias) === "undefined") {
+    if (typeof config.resolve.alias === 'undefined') {
       config.resolve.alias = {};
     }
-    config.resolve.alias.src = path.resolve(__dirname, "src");
+    config.resolve.alias.src = path.resolve(__dirname, 'src');
   }
   // 启用静态文件支持
   if (config.module && config.module.rules) {
     config.module.rules.push({
       test: /\.(png|svg|jpg|gif|eot|woff|ttf)$/,
-      use: [{
-        loader: 'url-loader',
-        options: {
-          limit: 20000,
-        }
-      }]
+      use: [
+        {
+          loader: 'url-loader',
+          options: {
+            limit: 20000,
+          },
+        },
+      ],
     });
   }
   // 不生成bundle分析
   if (config.mode === 'production' && hasArgument('o')) {
     for (const k in config.plugins) {
       const it = config.plugins[k];
-      if (typeof(it) === 'object' && it.__proto__.constructor.name === 'BundleAnalyzerPlugin') {
+      if (typeof it === 'object' && it.__proto__.constructor.name === 'BundleAnalyzerPlugin') {
         config.plugins.splice(k, 1);
         break;
       }
@@ -62,35 +64,35 @@ module.exports = config => {
         root: 'React',
         commonjs2: 'react',
         commonjs: 'react',
-        amd: 'react'
-      }
+        amd: 'react',
+      },
     };
   }
   // 聚合d.ts文件
   if (config.mode === 'production' && config.plugins) {
     config.plugins.push({
-      apply: (compiler) => {
+      apply: compiler => {
         compiler.hooks.afterEmit.tap('BundleDTS', () => {
           // TS生成的dts不会自动转换paths，这里手动进行
           const libPath = path.resolve(__dirname, 'lib');
-          glob("./lib/**/*.d.ts", null, function (er, files) {
+          glob('./lib/**/*.d.ts', null, function(er, files) {
             files.forEach(filePath => {
-              let content = fs.readFileSync(filePath, { encoding: "utf8" });
+              let content = fs.readFileSync(filePath, { encoding: 'utf8' });
               if (content.includes("from 'src/")) {
                 content = content.replace(/from 'src\/(.*?)'/g, "from '" + libPath + "/$1'");
-                fs.writeFileSync(filePath, content, { encoding: "utf8" })
+                fs.writeFileSync(filePath, content, { encoding: 'utf8' });
               }
             });
 
             dts.bundle({
-              name: "react-markdown-editor-lite",
-              main: "lib/index.d.ts",
-              baseDir: "lib",
-              out: "temp_dts.tmp",
-              newLine: "\n",
-              indent: "  ",
+              name: 'react-markdown-editor-lite',
+              main: 'lib/index.d.ts',
+              baseDir: 'lib',
+              out: 'temp_dts.tmp',
+              newLine: '\n',
+              indent: '  ',
               verbose: false,
-              outputAsModuleFolder: false
+              outputAsModuleFolder: false,
             });
 
             console.log('bundle dts finished');
@@ -103,16 +105,16 @@ module.exports = config => {
             fs.renameSync('./lib/temp_dts.tmp', './lib/index.d.ts');
             // 移除掉文件中的less引用
             let content = fs.readFileSync('./lib/index.d.ts', {
-              encoding: "utf8"
+              encoding: 'utf8',
             });
-            content = content.replace(/(\s*)import '(.*?)\.less';/gi, "");
+            content = content.replace(/(\s*)import '(.*?)\.less';/gi, '');
             fs.writeFileSync('./lib/index.d.ts', content, {
-              encoding: "utf8"
+              encoding: 'utf8',
             });
           });
         });
-      }
-    })
+      },
+    });
   }
   return config;
 };

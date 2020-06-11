@@ -24,6 +24,9 @@ export abstract class Preview<T extends HTMLElement> extends React.Component<Pre
   }
 }
 
+/**
+ * 渲染输入的string或ReactElement作为预览
+ */
 export class HtmlRender extends Preview<HTMLDivElement> {
   getHtml() {
     if (typeof this.props.html === 'string') {
